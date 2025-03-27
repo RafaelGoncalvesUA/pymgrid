@@ -20,6 +20,7 @@ import numpy as np
 import gym
 from gym.utils import seeding
 from gym.spaces import Space, Discrete, Box
+
 from . import Preprocessing
 from pymgrid.algos.Control import SampleAverageApproximation
 
@@ -87,7 +88,8 @@ class Environment(gym.Env):
             self.baseline_sampling_args = env_config['baseline_sampling_args']
             self.saa = generate_sampler(self.mg, self.forecast_args)
         
-        self.observation_space = Box(low=-1, high=np.float('inf'), shape=(self.Ns,), dtype=np.float)
+        # self.observation_space = spaces.Box(low=-1, high=float('inf'), shape=(self.Ns,), dtype=float)
+        self.observation_space = Box(low=-1, high=float('inf'), shape=(self.Ns,), dtype=float)
         #np.zeros(len(self.mg._df_record_state.keys()))
         # Action space
         self.metadata = {"render.modes": [ "human"]}
@@ -146,6 +148,7 @@ class Environment(gym.Env):
         self.round += 1
 
         return self.state, self.reward, self.done, self.info
+        # return self.state, self.reward, self.done, False, self.info
         
 #         control_dict = self.get_action(action)
 #         self.mg.run(control_dict)
@@ -170,6 +173,7 @@ class Environment(gym.Env):
         
         self.state, self.reward, self.done, self.info =  self.transition(), 0, False, {}
         
+        # return self.state, self.info
         return self.state
 
 
