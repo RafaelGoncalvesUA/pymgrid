@@ -5,7 +5,7 @@ from pymgrid.Microgrid import Microgrid
 from pymgrid.MicrogridGenerator import MicrogridGenerator
 from copy import deepcopy
 from pymgrid.algos.Control import SampleAverageApproximation, ModelPredictiveControl
-from spinup.utils.logx import EpochLogger
+# from spinup.utils.logx import EpochLogger
 
 
 logger = logging.getLogger(__name__)
@@ -83,7 +83,7 @@ class MicrogridEnv(Env, ABC):
         self.has_genset = self.microgrid.architecture['genset'] == 1
 
         observation_dim = len(self.microgrid._df_record_state)
-        self.observation_space = gym.spaces.Box(low=0, high=np.float('inf'), shape=(observation_dim,), dtype=np.float64)
+        self.observation_space = gym.spaces.Box(low=0, high=float('inf'), shape=(observation_dim,), dtype=np.float64)
         self.action_space = None
 
         self.current_action = None
@@ -184,7 +184,7 @@ class ContinuousMicrogridEnv(MicrogridEnv):
         super().__init__(microgrid, trajectory_len=trajectory_len, max_episode_len=max_episode_len)
 
         self.logger = kwargs['logger'] if 'logger' in kwargs else None
-        assert self.logger is None or isinstance(self.logger, EpochLogger)
+        # assert self.logger is None or isinstance(self.logger, EpochLogger)
 
         action_dim = 5+self.has_genset
         upper_bound, lower_bound = self._get_action_ub_lb()
@@ -412,7 +412,7 @@ class ContinuousMicrogridEnv(MicrogridEnv):
             self.microgrid.horizon = old_horizon
             if self.has_genset:
 
-                action_keys = 'genset', 'grid_import, grid_export, battery_charge, battery_discharge, pv_consummed'
+                action_keys = 'genset', 'grid_import', 'grid_export', 'battery_charge', 'battery_discharge', 'pv_consummed'
 
                 for j, name in enumerate(action_keys):
                     action_mean[j] = np.mean(mpc_output['action'][name])
@@ -425,7 +425,7 @@ class ContinuousMicrogridEnv(MicrogridEnv):
                     obs_std[j] = np.std(mpc_output['status'][name])
 
             else:
-                action_keys = 'grid_import', 'grid_export', 'battery_charge', 'battery_discharge', 'pv_consummed'
+                action_keys = 'genset', 'grid_import', 'grid_export', 'battery_charge', 'battery_discharge', 'pv_consummed'
 
                 for j, name in enumerate(action_keys):
                     action_mean[j] = np.mean(mpc_output['action'][name])
@@ -672,4 +672,3 @@ class SafeExpMicrogridSampleEnv(SafeExpMicrogridEnv):
         sample_reset(self.has_grid, self.saa, self.microgrid, sampling_args=sampling_args)
         observations = super().reset()
         return observations
-
